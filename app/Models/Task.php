@@ -18,7 +18,8 @@ class Task extends Model
     protected $fillable = [
         'title',
         'description',
-        'completed',
+        'status',
+        'due_at',
         'user_id',
     ];
 
@@ -28,7 +29,7 @@ class Task extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'completed' => 'boolean',
+        'due_at' => 'datetime',
     ];
 
     /**

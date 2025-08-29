@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\TaskTrack;
+use App\Models\Task;
 use Illuminate\Http\Request;
 
 class TaskController extends Controller
@@ -27,7 +27,7 @@ class TaskController extends Controller
         return response()->json($task, 201);
     }
 
-    public function update(Request $request, TaskTrack $task)
+    public function update(Request $request, Task $task)
     {
         abort_unless($task->user_id === $request->user()->id, 403);
 
@@ -42,7 +42,7 @@ class TaskController extends Controller
         return response()->json($task);
     }
 
-    public function destroy(Request $request, TaskTrack $task)
+    public function destroy(Request $request, Task $task)
     {
         abort_unless($task->user_id === $request->user()->id, 403);
         $task->delete();

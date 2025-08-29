@@ -159,72 +159,7 @@ export function useTaskFilters() {
 }
 
 // Custom hook for authentication
-export function useAuth() {
-  const [user, setUser] = React.useState<any>(null);
-  const [loading, setLoading] = React.useState(true);
-  const [authenticated, setAuthenticated] = React.useState(false);
-
-  const checkAuth = React.useCallback(async () => {
-    try {
-      const userData = await apiRequest<any>('/api/user');
-      setUser(userData);
-      setAuthenticated(true);
-    } catch {
-      setUser(null);
-      setAuthenticated(false);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const login = React.useCallback(async (credentials: { email: string; password: string }) => {
-    try {
-      await apiRequest('/api/login', {
-        method: 'POST',
-        body: JSON.stringify(credentials),
-      });
-      await checkAuth();
-    } catch (err) {
-      throw new Error(err instanceof Error ? err.message : 'Login failed');
-    }
-  }, [checkAuth]);
-
-  const register = React.useCallback(async (userData: { name: string; email: string; password: string; password_confirmation: string }) => {
-    try {
-      await apiRequest('/api/register', {
-        method: 'POST',
-        body: JSON.stringify(userData),
-      });
-      await checkAuth();
-    } catch (err) {
-      throw new Error(err instanceof Error ? err.message : 'Registration failed');
-    }
-  }, [checkAuth]);
-
-  const logout = React.useCallback(async () => {
-    try {
-      await apiRequest('/api/logout', { method: 'POST' });
-      setUser(null);
-      setAuthenticated(false);
-    } catch (err) {
-      console.error('Logout error:', err);
-    }
-  }, []);
-
-  React.useEffect(() => {
-    checkAuth();
-  }, [checkAuth]);
-
-  return {
-    user,
-    loading,
-    authenticated,
-    login,
-    register,
-    logout,
-    checkAuth,
-  };
-}
+export { useAuthContext as useAuth } from './AuthContext';
 
 // Custom hook for modals
 export function useModal() {

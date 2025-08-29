@@ -7,39 +7,33 @@ import '../css/app.css';
 import { Task, TaskForm as TaskFormType } from './types';
 import type { Toast as ToastType } from './types';
 import { csrf, getCsrfToken, apiRequest, formatDate, isOverdue, getDaysUntilDue } from './utils';
-import { useTasks, useToasts, useTaskFilters, useAuth, useModal, useFormValidation, useKeyboardShortcuts } from './hooks';
+import { useTasks, useToasts, useTaskFilters, useModal, useFormValidation, useKeyboardShortcuts } from './hooks';
 import { TaskCard } from './components/TaskCard';
 import { StatusBadge } from './components/StatusBadge';
 import { TaskForm } from './components/TaskForm';
+import { AllTasks } from './components/AllTasks';
+import { Calendar } from './components/Calendar';
+import { AuthProvider, useAuthContext } from './AuthContext';
 
 // --- AUTH COMPONENTS ---
 function RequireAuth({ children }: { children: React.ReactElement }) {
-  const [checked, setChecked] = React.useState(false);
-  const [authed, setAuthed] = React.useState(false);
+  const { user, loading } = useAuthContext();
 
-  React.useEffect(() => {
-    (async () => {
-      try {
-        await csrf();
-        const res = await fetch('/api/user', { credentials: 'include' });
-        setAuthed(res.ok);
-      } catch {
-        setAuthed(false);
-      } finally {
-        setChecked(true);
-      }
-    })();
-  }, []);
-
-  if (!checked) return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="glass p-8 rounded-2xl">
-        <div className="spinner mx-auto mb-4"></div>
-        <p className="text-center text-slate-400">Checking session...</p>
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="glass p-8 rounded-2xl">
+          <div className="spinner mx-auto mb-4"></div>
+          <p className="text-center text-slate-400">Checking session...</p>
+        </div>
       </div>
-    </div>
-  );
-  if (!authed) return <Navigate to="/login" replace />;
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
   return children;
 }
 
@@ -99,12 +93,13 @@ function Modal({ isOpen, onClose, title, children }: {
 
 // --- LAYOUT COMPONENTS ---
 function Sidebar() {
-  const { logout } = useAuth();
+  const { logout } = useAuthContext();
+  const location = useLocation();
 
   const navItems = [
-    { name: 'My Day', icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z', active: true },
-    { name: 'All Tasks', icon: 'M3 4h18M3 12h18M3 20h18' },
-    { name: 'Calendar', icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z' },
+    { name: 'My Day', path: '/', icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' },
+    { name: 'All Tasks', path: '/tasks', icon: 'M3 4h18M3 12h18M3 20h18' },
+    { name: 'Calendar', path: '/calendar', icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z' },
   ];
 
   return (
@@ -119,9 +114,9 @@ function Sidebar() {
           {navItems.map(item => (
             <a
               key={item.name}
-              href="#"
+              href={item.path}
               className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-                item.active
+                location.pathname === item.path
                   ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/50'
               }`}
@@ -177,9 +172,8 @@ function AuthLayout({ children }: { children: React.ReactNode }) {
 
 // --- PAGES ---
 function Login() {
-  const [loading, setLoading] = React.useState(false);
   const { addToast } = useToasts();
-  const { login } = useAuth();
+  const { login, loading, error } = useAuthContext();
 
   const initialValues = { email: '', password: '' };
   const validationSchema = (values: typeof initialValues) => {
@@ -203,15 +197,11 @@ function Login() {
     e.preventDefault();
     if (!validate()) return;
     
-    setLoading(true);
     try {
       await login(values);
       addToast({ message: 'Welcome back!', type: 'success' });
-      setTimeout(() => window.location.href = '/', 1000);
     } catch (error) {
       addToast({ message: error instanceof Error ? error.message : 'Login failed', type: 'error' });
-    } finally {
-      setLoading(false);
     }
   }
 
@@ -275,9 +265,8 @@ function Login() {
 }
 
 function Register() {
-  const [loading, setLoading] = React.useState(false);
   const { addToast } = useToasts();
-  const { register } = useAuth();
+  const { register, loading, error } = useAuthContext();
 
   const initialValues = { name: '', email: '', password: '', password_confirmation: '' };
   const validationSchema = (values: typeof initialValues) => {
@@ -306,15 +295,11 @@ function Register() {
     e.preventDefault();
     if (!validate()) return;
     
-    setLoading(true);
     try {
       await register(values);
       addToast({ message: 'Account created successfully!', type: 'success' });
-      setTimeout(() => window.location.href = '/', 1000);
     } catch (error) {
       addToast({ message: error instanceof Error ? error.message : 'Registration failed', type: 'error' });
-    } finally {
-      setLoading(false);
     }
   }
 
@@ -413,6 +398,7 @@ function Dashboard() {
   const { tasks, loading, addTask, updateTask, deleteTask, toggleTaskStatus } = useTasks();
   const { toasts, addToast, removeToast } = useToasts();
   const { filterTasks, query, setQuery, filter, setFilter, sortBy, setSortBy, sortOrder, setSortOrder } = useTaskFilters();
+  const { user } = useAuthContext(); // Get user from auth context
   
   // Modal states
   const addModal = useModal();
@@ -517,7 +503,7 @@ function Dashboard() {
 
       {/* Header */}
       <div className="mb-8 animate-fade-in">
-        <h1 className="text-4xl font-bold text-slate-100">{greeting}, User.</h1>
+        <h1 className="text-4xl font-bold text-slate-100">{greeting}, {user?.name || 'User'}.</h1>
         <p className="text-lg mt-2 text-slate-400">Run your day or your day will run you.</p>
       </div>
 
@@ -622,13 +608,17 @@ function Dashboard() {
 // --- APP ROUTER ---
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/" element={<RequireAuth><Dashboard /></RequireAuth>} />
-      </Routes>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/" element={<RequireAuth><Dashboard /></RequireAuth>} />
+          <Route path="/tasks" element={<RequireAuth><AllTasks /></RequireAuth>} />
+          <Route path="/calendar" element={<RequireAuth><Calendar /></RequireAuth>} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 

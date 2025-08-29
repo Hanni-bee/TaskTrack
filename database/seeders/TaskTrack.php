@@ -4,8 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\TaskTrack as TaskTrackModel;
-use Illuminate\Support\Str;
+use App\Models\Task as TaskModel;
 
 class TaskTrack extends Seeder
 {
@@ -14,6 +13,6 @@ class TaskTrack extends Seeder
      */
     public function run(): void
     {
-        TaskTrackModel::factory()->count(5)->create();
+        TaskModel::factory()->count(5)->create();
     }
 }
