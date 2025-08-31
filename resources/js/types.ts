@@ -1,17 +1,20 @@
 // Task Management Types
 export interface Task {
-  id: number;
+  id: string;
   title: string;
   description?: string;
   status: 'pending' | 'in_progress' | 'done';
   due_at?: string;
   created_at: string;
   updated_at: string;
-  user_id: number;
+  user_id: string;
   category?: string;
-  priority: 'low' | 'medium' | 'high';
+  priority?: 'low' | 'medium' | 'high';
   reminder_at?: string;
   notes?: string;
+  notified_overdue?: boolean;
+  notified_reminder?: boolean;
+  total_time?: number;
 }
 
 export interface User {
@@ -79,10 +82,20 @@ export type TaskSortBy = 'created_at' | 'due_at' | 'title';
 export type SortOrder = 'asc' | 'desc';
 
 // API Response Types
+export interface ValidationErrors {
+  [key: string]: string[];
+}
+
+export interface FormState<T> {
+  data: T;
+  errors: ValidationErrors;
+  processing: boolean;
+}
+
 export interface ApiResponse<T = any> {
-  data?: T;
+  data: T;
   message?: string;
-  errors?: Record<string, string[]>;
+  errors?: ValidationErrors;
 }
 
 export interface PaginatedResponse<T> {
@@ -93,12 +106,51 @@ export interface PaginatedResponse<T> {
   total: number;
 }
 
+// React types for Laravel environment
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      [elemName: string]: any;
+    }
+  }
+}
+
+// Enhanced feature types
+export interface TimeEntry {
+  id: string;
+  taskId: string;
+  startTime: Date;
+  endTime?: Date;
+  duration: number;
+  description?: string;
+}
+
+export interface TaskTemplate {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  priority: 'low' | 'medium' | 'high';
+  estimatedDuration?: number;
+  tags: string[];
+  icon: string;
+}
+
+export interface DragItem {
+  id: string;
+  index: number;
+  type: 'task';
+}
+
+export type Theme = 'light' | 'dark' | 'system';
+export type ResolvedTheme = 'light' | 'dark';
+
 // Component Props Types
 export interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
-  title: string;
-  children: React.ReactNode;
+  title?: string;
+  children: any;
 }
 
 export interface ToastProps {

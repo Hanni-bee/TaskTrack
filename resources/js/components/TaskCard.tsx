@@ -5,10 +5,11 @@ import { formatDate, isOverdue, getDaysUntilDue } from '../utils';
 
 interface TaskCardProps {
   task: Task;
-  onToggleStatus: (id: number, status: Task['status']) => void;
+  onToggleStatus: (id: string) => void;
   onEdit: (task: Task) => void;
-  onDelete: (id: number) => void;
+  onDelete: (id: string) => void;
   index: number;
+  isKanban?: boolean;
 }
 
 export function TaskCard({ task, onToggleStatus, onEdit, onDelete, index }: TaskCardProps) {
