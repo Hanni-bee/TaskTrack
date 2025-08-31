@@ -42,7 +42,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLoading(true);
     setError(null);
     try {
-      await apiRequest('http://127.0.0.1:8000/api/login', { method: 'POST', body: JSON.stringify(credentials) });
+      await apiRequest('http://127.0.0.1:8000/login', { method: 'POST', body: JSON.stringify(credentials) });
       // Navigate to the dashboard after successful login
       window.location.href = '/';
       const userData = await apiRequest<User>('/api/user');
