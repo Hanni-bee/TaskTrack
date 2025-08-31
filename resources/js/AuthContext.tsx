@@ -1,6 +1,16 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { apiRequest } from './utils';
 
+// Sanitize error messages to prevent information leakage
+const sanitizeError = (error: any): string => {
+  if (error.status === 422) return 'Invalid input provided';
+  if (error.status === 401) return 'Invalid credentials';
+  if (error.status === 403) return 'Access denied';
+  if (error.status === 429) return 'Too many requests. Please try again later.';
+  if (error.status >= 500) return 'Server error. Please try again later.';
+  return 'An error occurred. Please try again.';
+};
+
 interface User {
   id: number;
   name: string;
@@ -48,8 +58,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const userData = await apiRequest<User>('/api/user');
       setUser(userData);
     } catch (err: any) {
-      setError(err.message);
-      throw new Error(err.message);
+      const sanitizedError = sanitizeError(err);
+      setError(sanitizedError);
+      throw new Error(sanitizedError);
     } finally {
       setLoading(false);
     }
@@ -63,8 +74,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const userResponse = await apiRequest<User>('/api/user');
       setUser(userResponse);
     } catch (err: any) {
-      setError(err.message);
-      throw new Error(err.message);
+      const sanitizedError = sanitizeError(err);
+      setError(sanitizedError);
+      throw new Error(sanitizedError);
     } finally {
       setLoading(false);
     }

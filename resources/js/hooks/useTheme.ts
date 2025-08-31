@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
+import { safeStorage } from '../utils/safeStorage';
 
 export type Theme = 'light' | 'dark' | 'system';
 export type ResolvedTheme = 'light' | 'dark';
 
 export function useTheme() {
   const [theme, setTheme] = useState<Theme>(() => {
-    const stored = localStorage.getItem('theme') as Theme;
+    const stored = safeStorage.getItem('theme') as Theme;
     return stored || 'system';
   });
 
@@ -58,7 +59,7 @@ export function useTheme() {
     };
 
     updateTheme(theme);
-    localStorage.setItem('theme', theme);
+    safeStorage.setItem('theme', theme);
 
     // Listen for system theme changes
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');

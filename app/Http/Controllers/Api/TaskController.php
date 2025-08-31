@@ -10,7 +10,11 @@ class TaskController extends Controller
 {
     public function index(Request $request)
     {
-        $tasks = $request->user()->tasks()->latest()->get();
+        $tasks = $request->user()
+            ->tasks()
+            ->latest()
+            ->paginate(50);
+        
         return response()->json($tasks);
     }
 

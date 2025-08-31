@@ -18,6 +18,24 @@ export function NotificationSystem({ tasks }: NotificationSystemProps) {
   }, []);
 
   useEffect(() => {
+    if (isEnabled && permission === 'granted') {
+      checkOverdueTasks();
+      scheduleDailyDigest(tasks);
+    }
+
+    // Cleanup function to prevent memory leaks
+    return () => {
+      // Clear any pending timeouts or intervals
+      if (typeof window !== 'undefined') {
+        const highestTimeoutId = setTimeout(() => {}, 0);
+        for (let i = 0; i < highestTimeoutId; i++) {
+          clearTimeout(i);
+        }
+      }
+    };
+  }, [isEnabled, permission, tasks]);
+
+  useEffect(() => {
     if (!isEnabled || permission !== 'granted') return;
 
     // Check for overdue tasks every minute
