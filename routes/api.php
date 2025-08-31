@@ -31,6 +31,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/subscription', [SubscriptionController::class, 'show']);
     Route::post('/subscription/upgrade', [SubscriptionController::class, 'upgrade']);
     Route::get('/subscription/export', [SubscriptionController::class, 'exportData']);
+
+    // Analytics routes
+    Route::get('/analytics/dashboard', [App\Http\Controllers\Api\AnalyticsController::class, 'dashboard']);
 });
 
 

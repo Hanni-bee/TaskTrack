@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Task;
+use App\Models\TaskEvent;
 use Illuminate\Http\Request;
 
 class TaskController extends Controller
@@ -57,6 +58,14 @@ class TaskController extends Controller
         }
 
         $task = $user->tasks()->create($validated);
+        
+        // Log task creation event for analytics
+        TaskEvent::logEvent($user->id, $task->id, 'created', [
+            'category' => $task->category,
+            'priority' => $task->priority,
+            'has_due_date' => !is_null($task->due_at),
+        ]);
+        
         return response()->json($task, 201);
     }
 
@@ -90,7 +99,27 @@ class TaskController extends Controller
             ], 403);
         }
 
+        $oldStatus = $task->status;
         $task->update($validated);
+        
+        // Log task update event for analytics
+        $eventData = [
+            'old_status' => $oldStatus,
+            'new_status' => $task->status,
+            'category' => $task->category,
+            'priority' => $task->priority,
+        ];
+        
+        TaskEvent::logEvent($user->id, $task->id, 'updated', $eventData);
+        
+        // Log completion event if status changed to done
+        if ($oldStatus !== 'done' && $task->status === 'done') {
+            TaskEvent::logEvent($user->id, $task->id, 'completed', [
+                'completion_time' => now(),
+                'was_overdue' => $task->due_at && now() > $task->due_at,
+            ]);
+        }
+        
         return response()->json($task);
     }
 

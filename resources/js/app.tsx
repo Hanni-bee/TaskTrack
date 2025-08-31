@@ -15,6 +15,8 @@ import { AllTasks } from './components/AllTasks';
 import { Calendar } from './components/Calendar';
 import { SubscriptionCard } from './components/SubscriptionCard';
 import { SubscriptionPage } from './components/SubscriptionPage';
+import { AdvancedAnalyticsDashboard } from './components/AdvancedAnalyticsDashboard';
+import { PremiumAnalyticsGate } from './components/PremiumAnalyticsGate';
 import { AuthProvider, useAuthContext } from './AuthContext';
 
 // --- AUTH COMPONENTS ---
@@ -102,6 +104,7 @@ function Sidebar() {
     { name: 'My Day', path: '/', icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' },
     { name: 'All Tasks', path: '/tasks', icon: 'M3 4h18M3 12h18M3 20h18' },
     { name: 'Calendar', path: '/calendar', icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z' },
+    { name: 'Analytics', path: '/analytics', icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' },
   ];
 
   return (
@@ -619,6 +622,7 @@ function App() {
           <Route path="/" element={<RequireAuth><Dashboard /></RequireAuth>} />
           <Route path="/tasks" element={<RequireAuth><AllTasks /></RequireAuth>} />
           <Route path="/calendar" element={<RequireAuth><Calendar /></RequireAuth>} />
+          <Route path="/analytics" element={<RequireAuth><PremiumAnalyticsGate><AdvancedAnalyticsDashboard tasks={[]} /></PremiumAnalyticsGate></RequireAuth>} />
           <Route path="/subscription" element={<RequireAuth><SubscriptionPage /></RequireAuth>} />
         </Routes>
       </BrowserRouter>
