@@ -21,6 +21,10 @@ class Task extends Model
         'status',
         'due_at',
         'user_id',
+        'category',
+        'priority',
+        'reminder_at',
+        'notes',
     ];
 
     /**
@@ -30,6 +34,7 @@ class Task extends Model
      */
     protected $casts = [
         'due_at' => 'datetime',
+        'reminder_at' => 'datetime',
     ];
 
     /**

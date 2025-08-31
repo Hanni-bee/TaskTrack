@@ -30,6 +30,11 @@ class RegisteredUserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->input('password')),
+            'subscription_type' => 'basic',
+            'task_limit' => 10,
+            'can_set_reminders' => false,
+            'can_use_categories' => false,
+            'can_export_data' => false,
         ]);
 
         event(new Registered($user));

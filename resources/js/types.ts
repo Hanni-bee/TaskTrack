@@ -8,6 +8,10 @@ export interface Task {
   created_at: string;
   updated_at: string;
   user_id: number;
+  category?: string;
+  priority: 'low' | 'medium' | 'high';
+  reminder_at?: string;
+  notes?: string;
 }
 
 export interface User {
@@ -17,6 +21,24 @@ export interface User {
   email_verified_at?: string;
   created_at: string;
   updated_at: string;
+  subscription_type: 'basic' | 'premium';
+  subscription_expires_at?: string;
+  task_limit: number;
+  can_set_reminders: boolean;
+  can_use_categories: boolean;
+  can_export_data: boolean;
+}
+
+export interface Subscription {
+  subscription_type: 'basic' | 'premium';
+  subscription_expires_at?: string;
+  task_limit: number;
+  current_tasks: number;
+  remaining_tasks: number;
+  can_set_reminders: boolean;
+  can_use_categories: boolean;
+  can_export_data: boolean;
+  is_premium: boolean;
 }
 
 // Form Types
@@ -37,6 +59,10 @@ export interface TaskForm {
   description?: string;
   due_at?: string;
   status: 'pending' | 'in_progress' | 'done';
+  category?: string;
+  priority: 'low' | 'medium' | 'high';
+  reminder_at?: string;
+  notes?: string;
 }
 
 // UI Types

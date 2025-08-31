@@ -13,6 +13,8 @@ import { StatusBadge } from './components/StatusBadge';
 import { TaskForm } from './components/TaskForm';
 import { AllTasks } from './components/AllTasks';
 import { Calendar } from './components/Calendar';
+import { SubscriptionCard } from './components/SubscriptionCard';
+import { SubscriptionPage } from './components/SubscriptionPage';
 import { AuthProvider, useAuthContext } from './AuthContext';
 
 // --- AUTH COMPONENTS ---
@@ -404,6 +406,7 @@ function Dashboard() {
   const addModal = useModal();
   const editModal = useModal();
   const [editingTask, setEditingTask] = React.useState<Task | null>(null);
+  const [currentView, setCurrentView] = useState<'dashboard' | 'all-tasks' | 'calendar' | 'subscription'>('dashboard');
   const [formLoading, setFormLoading] = React.useState(false);
 
   // Keyboard shortcuts
@@ -616,6 +619,7 @@ function App() {
           <Route path="/" element={<RequireAuth><Dashboard /></RequireAuth>} />
           <Route path="/tasks" element={<RequireAuth><AllTasks /></RequireAuth>} />
           <Route path="/calendar" element={<RequireAuth><Calendar /></RequireAuth>} />
+          <Route path="/subscription" element={<RequireAuth><SubscriptionPage /></RequireAuth>} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

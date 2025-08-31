@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\TaskController;
+use App\Http\Controllers\Api\SubscriptionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,6 +26,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/tasks', [TaskController::class, 'store']);
     Route::put('/tasks/{task}', [TaskController::class, 'update']);
     Route::delete('/tasks/{task}', [TaskController::class, 'destroy']);
+
+    // Subscription management routes
+    Route::get('/subscription', [SubscriptionController::class, 'show']);
+    Route::post('/subscription/upgrade', [SubscriptionController::class, 'upgrade']);
+    Route::get('/subscription/export', [SubscriptionController::class, 'exportData']);
 });
 
 

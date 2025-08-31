@@ -23,6 +23,12 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'subscription_type',
+        'subscription_expires_at',
+        'task_limit',
+        'can_set_reminders',
+        'can_use_categories',
+        'can_export_data',
     ];
 
     /**
@@ -45,6 +51,10 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'subscription_expires_at' => 'datetime',
+            'can_set_reminders' => 'boolean',
+            'can_use_categories' => 'boolean',
+            'can_export_data' => 'boolean',
         ];
     }
 
@@ -54,5 +64,45 @@ class User extends Authenticatable
     public function tasks(): HasMany
     {
         return $this->hasMany(Task::class);
+    }
+
+    /**
+     * Check if user has premium subscription
+     */
+    public function isPremium(): bool
+    {
+        return $this->subscription_type === 'premium' && 
+               ($this->subscription_expires_at === null || $this->subscription_expires_at->isFuture());
+    }
+
+    /**
+     * Check if user can create more tasks
+     */
+    public function canCreateTask(): bool
+    {
+        return $this->tasks()->count() < $this->task_limit;
+    }
+
+    /**
+     * Get remaining task slots
+     */
+    public function getRemainingTaskSlots(): int
+    {
+        return max(0, $this->task_limit - $this->tasks()->count());
+    }
+
+    /**
+     * Upgrade user to premium
+     */
+    public function upgradeToPremium(): void
+    {
+        $this->update([
+            'subscription_type' => 'premium',
+            'subscription_expires_at' => now()->addYear(),
+            'task_limit' => 1000,
+            'can_set_reminders' => true,
+            'can_use_categories' => true,
+            'can_export_data' => true,
+        ]);
     }
 }
