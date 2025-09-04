@@ -71,7 +71,7 @@ class User extends Authenticatable
      */
     public function isPremium(): bool
     {
-        return $this->subscription_type === 'premium' && 
+        return $this->subscription_type === 'premium' &&
                ($this->subscription_expires_at === null || $this->subscription_expires_at->isFuture());
     }
 
@@ -80,29 +80,33 @@ class User extends Authenticatable
      */
     public function canCreateTask(): bool
     {
+        if ($this->isPremium()) {
+            return true; // Premium users have unlimited tasks
+        }
         return $this->tasks()->count() < $this->task_limit;
     }
 
     /**
-     * Get remaining task slots
+     * Check if user can set reminders
      */
-    public function getRemainingTaskSlots(): int
+    public function canSetReminders(): bool
     {
-        return max(0, $this->task_limit - $this->tasks()->count());
+        return $this->isPremium() && $this->can_set_reminders;
     }
 
     /**
-     * Upgrade user to premium
+     * Check if user can use categories
      */
-    public function upgradeToPremium(): void
+    public function canUseCategories(): bool
     {
-        $this->update([
-            'subscription_type' => 'premium',
-            'subscription_expires_at' => now()->addYear(),
-            'task_limit' => 1000,
-            'can_set_reminders' => true,
-            'can_use_categories' => true,
-            'can_export_data' => true,
-        ]);
+        return $this->isPremium() && $this->can_use_categories;
+    }
+
+    /**
+     * Check if user can export data
+     */
+    public function canExportData(): bool
+    {
+        return $this->isPremium() && $this->can_export_data;
     }
 }

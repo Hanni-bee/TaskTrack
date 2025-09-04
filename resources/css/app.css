@@ -2,491 +2,287 @@
 @tailwind components;
 @tailwind utilities;
 
-/*
-================================================================================
-  TASK MANAGEMENT COLOR SCHEME
-  - Productivity-focused colors
-  - Professional and modern gradients
-  - Accessibility-friendly contrast
-================================================================================
-*/
+/* Custom CSS Variables */
 :root {
-  /* Primary Brand Colors */
-  --primary-50: #eff6ff;
-  --primary-100: #dbeafe;
-  --primary-200: #bfdbfe;
-  --primary-300: #93c5fd;
-  --primary-400: #60a5fa;
-  --primary-500: #3b82f6;
-  --primary-600: #2563eb;
-  --primary-700: #1d4ed8;
-  --primary-800: #1e40af;
-  --primary-900: #1e3a8a;
-
-  /* Background Colors */
-  --bg-deep: #0f172a;
-  --bg-surface: #1e293b;
-  --bg-elevated: #334155;
-  --bg-overlay: rgba(15, 23, 42, 0.8);
-
-  /* Text Colors */
-  --text-primary: #f8fafc;
-  --text-secondary: #cbd5e1;
-  --text-muted: #64748b;
-  --text-inverse: #0f172a;
-
-  /* Status Colors */
-  --status-pending: #f59e0b;
-  --status-progress: #3b82f6;
-  --status-done: #10b981;
-  --status-overdue: #ef4444;
-
-  /* Accent Colors */
-  --accent-success: #10b981;
-  --accent-warning: #f59e0b;
-  --accent-danger: #ef4444;
-  --accent-info: #06b6d4;
-
-  /* Border Colors */
-  --border-light: rgba(148, 163, 184, 0.1);
-  --border-medium: rgba(148, 163, 184, 0.2);
-  --border-strong: rgba(148, 163, 184, 0.3);
-
-  /* Shadow Colors */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --glass-bg: rgba(15, 23, 42, 0.8);
+  --glass-border: rgba(148, 163, 184, 0.1);
 }
 
-/*
-================================================================================
-  ANIMATED GRADIENT BACKGROUND
-  - Multiple layered gradients for depth
-  - Subtle animation for visual interest
-  - Performance optimized
-================================================================================
-*/
+/* Base Styles */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #0f172a;
+  color: #e2e8f0;
+  line-height: 1.6;
+}
+
+/* Gradient Background */
 .gradient-background {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
   z-index: -1;
-  background: linear-gradient(135deg, var(--bg-deep) 0%, #1e293b 50%, #334155 100%);
-  overflow: hidden;
 }
 
-.gradient-background::before,
-.gradient-background::after {
-  content: '';
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.15;
-  animation: float 20s ease-in-out infinite;
+/* Glass Effect */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
-.gradient-background::before {
-  width: 600px;
-  height: 600px;
-  background: linear-gradient(45deg, var(--primary-500), var(--accent-info));
-  top: -200px;
-  left: -200px;
-  animation-delay: 0s;
+/* Modern Input Styles */
+.input-modern {
+  @apply w-full px-4 py-3 bg-slate-800/50 border border-slate-700/50 rounded-xl text-slate-200 placeholder-slate-500;
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50;
+  @apply transition-all duration-200 backdrop-blur-sm;
 }
 
-.gradient-background::after {
-  width: 500px;
-  height: 500px;
-  background: linear-gradient(45deg, var(--accent-success), var(--accent-warning));
-  bottom: -150px;
-  right: -150px;
-  animation-delay: -10s;
+.input-modern:focus {
+  background: rgba(30, 41, 59, 0.8);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.2);
 }
 
-@keyframes float {
-  0%, 100% { transform: translate(0, 0) rotate(0deg); }
-  25% { transform: translate(50px, 50px) rotate(90deg); }
-  50% { transform: translate(0, 100px) rotate(180deg); }
-  75% { transform: translate(-50px, 50px) rotate(270deg); }
+/* Button Styles */
+.btn-primary {
+  @apply px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium rounded-xl;
+  @apply hover:from-blue-700 hover:to-purple-700 transform hover:scale-105;
+  @apply transition-all duration-200 shadow-lg hover:shadow-xl;
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500/50;
 }
 
-/*
-================================================================================
-  PAGE TRANSITIONS
-  - Seamless transitions between pages
-  - Smooth animations for better UX
-================================================================================
-*/
-.page-transition-enter {
-  opacity: 0;
-  transform: translateY(20px);
+.btn-secondary {
+  @apply px-6 py-3 bg-slate-700/50 text-slate-300 font-medium rounded-xl border border-slate-600/50;
+  @apply hover:bg-slate-600/50 hover:text-slate-200 transform hover:scale-105;
+  @apply transition-all duration-200;
+  @apply focus:outline-none focus:ring-2 focus:ring-slate-500/50;
 }
 
-.page-transition-enter-active {
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 300ms ease-out, transform 300ms ease-out;
+/* Loading Spinner */
+.spinner {
+  @apply inline-block w-5 h-5 border-2 border-slate-400 border-t-transparent rounded-full;
+  animation: spin 1s linear infinite;
 }
 
-.page-transition-exit {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.page-transition-exit-active {
-  opacity: 0;
-  transform: translateY(-20px);
-  transition: opacity 200ms ease-in, transform 200ms ease-in;
-}
-
-/*
-================================================================================
-  MODERN COMPONENT STYLES
-  - Glassmorphism effects
-  - Smooth transitions
-  - Consistent spacing
-================================================================================
-*/
-@layer components {
-  /* Glass Container */
-  .glass {
-    background: rgba(30, 41, 59, 0.7);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid var(--border-light);
-    box-shadow: var(--shadow-lg);
-    border-radius: 1rem;
-    transition: all 0.3s ease;
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
+}
 
-  .glass:hover {
-    border-color: var(--border-medium);
-    box-shadow: var(--shadow-xl);
+/* Toast Notifications */
+.toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  max-width: 400px;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-content {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
   }
-
-  /* Input Fields */
-  .input-modern {
-    width: 100%;
-    background: rgba(15, 23, 42, 0.6);
-    border: 1px solid var(--border-light);
-    border-radius: 0.75rem;
-    padding: 0.875rem 1rem;
-    color: var(--text-primary);
-    font-size: 0.95rem;
-    transition: all 0.2s ease;
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
+}
 
-  .input-modern::placeholder {
-    color: var(--text-muted);
+/* Enhanced Animations */
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
   }
-
-  .input-modern:focus {
-    outline: none;
-    border-color: var(--primary-500);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    background: rgba(15, 23, 42, 0.8);
-  }
-
-  /* Buttons */
-  .btn-primary {
-    background: linear-gradient(135deg, var(--primary-600), var(--primary-500));
-    color: white;
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.75rem;
-    font-weight: 600;
-    font-size: 0.95rem;
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: var(--shadow-md);
-  }
-
-  .btn-primary:hover {
-    background: linear-gradient(135deg, var(--primary-700), var(--primary-600));
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-lg);
-  }
-
-  .btn-primary:active {
+  to {
+    opacity: 1;
     transform: translateY(0);
   }
+}
 
-  .btn-secondary {
-    background: rgba(148, 163, 184, 0.1);
-    color: var(--text-primary);
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.75rem;
-    font-weight: 500;
-    border: 1px solid var(--border-light);
-    cursor: pointer;
-    transition: all 0.2s ease;
+.animate-slide-up {
+  animation: slideUp 0.5s ease-out forwards;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
   }
-
-  .btn-secondary:hover {
-    background: rgba(148, 163, 184, 0.2);
-    border-color: var(--border-medium);
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
+}
 
-  .btn-danger {
-    background: linear-gradient(135deg, var(--accent-danger), #dc2626);
-    color: white;
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.75rem;
-    font-weight: 600;
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s ease;
+.animate-bounce-in {
+  animation: bounceIn 0.6s ease-out forwards;
+}
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
   }
-
-  .btn-danger:hover {
-    background: linear-gradient(135deg, #dc2626, #b91c1c);
-    transform: translateY(-1px);
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
   }
-
-  .btn-success {
-    background: linear-gradient(135deg, var(--accent-success), #059669);
-    color: white;
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.75rem;
-    font-weight: 600;
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s ease;
+  70% {
+    transform: scale(0.9);
   }
-
-  .btn-success:hover {
-    background: linear-gradient(135deg, #059669, #047857);
-    transform: translateY(-1px);
+  100% {
+    opacity: 1;
+    transform: scale(1);
   }
+}
 
-  /* Modal Styles */
-  .modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(15, 23, 42, 0.8);
-    backdrop-filter: blur(8px);
-    z-index: 50;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
-    animation: modalFadeIn 0.3s ease-out;
-  }
+/* Hover Effects */
+.hover-lift {
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+}
 
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* Task Card Enhancements */
+.task-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.task-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* Badge Animations */
+.badge-hover {
+  transition: all 0.2s ease-out;
+}
+
+.badge-hover:hover {
+  transform: scale(1.05);
+  filter: brightness(1.1);
+}
+
+/* Form Enhancements */
+.form-group {
+  transition: all 0.2s ease-out;
+}
+
+.form-group:focus-within {
+  transform: translateY(-1px);
+}
+
+/* Calendar Enhancements */
+.calendar {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border-radius: 16px;
+  padding: 20px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
   .modal-content {
-    background: var(--bg-surface);
-    border-radius: 1rem;
-    border: 1px solid var(--border-light);
-    box-shadow: var(--shadow-xl);
-    max-width: 500px;
-    width: 100%;
-    max-height: 90vh;
-    overflow-y: auto;
-    animation: modalSlideIn 0.3s ease-out;
+    margin: 10px;
+    max-width: calc(100% - 20px);
   }
-
-  @keyframes modalFadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-
-  @keyframes modalSlideIn {
-    from {
-      opacity: 0;
-      transform: scale(0.95) translateY(-10px);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1) translateY(0);
-    }
-  }
-
-  /* Task Card */
-  .task-card {
-    background: rgba(30, 41, 59, 0.6);
-    border: 1px solid var(--border-light);
-    border-radius: 1rem;
-    padding: 1.25rem;
-    transition: all 0.2s ease;
-    cursor: pointer;
-  }
-
-  .task-card:hover {
-    background: rgba(30, 41, 59, 0.8);
-    border-color: var(--border-medium);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
-  }
-
-  /* Status Badges */
-  .status-badge {
-    padding: 0.375rem 0.75rem;
-    border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-
-  .status-pending {
-    background: rgba(245, 158, 11, 0.1);
-    color: var(--status-pending);
-    border: 1px solid rgba(245, 158, 11, 0.3);
-  }
-
-  .status-progress {
-    background: rgba(59, 130, 246, 0.1);
-    color: var(--status-progress);
-    border: 1px solid rgba(59, 130, 246, 0.3);
-  }
-
-  .status-done {
-    background: rgba(16, 185, 129, 0.1);
-    color: var(--status-done);
-    border: 1px solid rgba(16, 185, 129, 0.3);
-  }
-
-  .status-overdue {
-    background: rgba(239, 68, 68, 0.1);
-    color: var(--status-overdue);
-    border: 1px solid rgba(239, 68, 68, 0.3);
-  }
-
-  /* Loading Spinner */
-  .spinner {
-    width: 1.25rem;
-    height: 1.25rem;
-    border: 2px solid rgba(148, 163, 184, 0.2);
-    border-top-color: var(--primary-500);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    display: inline-block;
-  }
-
-  /* Toast Notifications */
+  
   .toast {
-    position: fixed;
-    top: 1.5rem;
-    right: 1.5rem;
-    z-index: 100;
-    background: var(--bg-surface);
-    border: 1px solid var(--border-light);
-    border-radius: 0.75rem;
-    padding: 1rem 1.5rem;
-    box-shadow: var(--shadow-lg);
-    animation: toastSlideIn 0.3s ease-out;
+    right: 10px;
+    left: 10px;
+    max-width: none;
   }
+}
 
-  @keyframes toastSlideIn {
-    from {
-      opacity: 0;
-      transform: translateX(100%);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
-  }
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
 
-  /* Animations */
-  .animate-fade-in {
-    animation: fadeIn 0.5s ease-out;
-  }
+::-webkit-scrollbar-track {
+  background: rgba(30, 41, 59, 0.5);
+  border-radius: 4px;
+}
 
-  .animate-slide-up {
-    animation: slideUp 0.3s ease-out;
-  }
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 4px;
+}
 
-  .animate-bounce-in {
-    animation: bounceIn 0.6s ease-out;
-  }
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.5);
+}
 
-  .animate-scale-in {
-    animation: scaleIn 0.3s ease-out;
-  }
+/* Focus States */
+*:focus {
+  outline: none;
+}
 
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
+*:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
 
-  @keyframes slideUp {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
+/* Selection */
+::selection {
+  background: rgba(59, 130, 246, 0.3);
+  color: #e2e8f0;
+}
 
-  @keyframes bounceIn {
-    0% {
-      opacity: 0;
-      transform: scale(0.3);
-    }
-    50% {
-      opacity: 1;
-      transform: scale(1.05);
-    }
-    70% {
-      transform: scale(0.9);
-    }
-    100% {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
-
-  @keyframes scaleIn {
-    from {
-      opacity: 0;
-      transform: scale(0.9);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
-
-  /* Enhanced Hover Effects */
-  .hover-lift {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
-
-  .hover-lift:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-xl);
-  }
-
-  /* Focus States */
-  .focus-ring:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-  }
-
-  /* Smooth Scrolling */
-  html {
-    scroll-behavior: smooth;
-  }
-
-  /* Custom Scrollbar */
-  ::-webkit-scrollbar {
-    width: 8px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: rgba(15, 23, 42, 0.3);
-    border-radius: 4px;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: rgba(148, 163, 184, 0.3);
-    border-radius: 4px;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: rgba(148, 163, 184, 0.5);
+/* Print Styles */
+@media print {
+  .glass {
+    background: white !important;
+    backdrop-filter: none !important;
+    border: 1px solid #e5e7eb !important;
   }
 }

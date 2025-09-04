@@ -1,61 +1,244 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# TaskTrack - Personal Task Management App
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A modern, responsive task management application built with Laravel 11 and React. Features user authentication, task creation, editing, filtering, and a calendar view.
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- 🔐 **User Authentication**: Secure login/register with email and password
+- 📝 **Task Management**: Create, edit, delete, and organize tasks
+- 🎯 **Status Tracking**: Track task progress (pending, in progress, done)
+- 📅 **Calendar View**: Visual calendar with task indicators
+- 🔍 **Search & Filter**: Find tasks quickly with search and status filters
+- 📱 **Responsive Design**: Works on desktop, tablet, and mobile
+- ⚡ **Real-time Updates**: Instant task updates without page refresh
+- 🎨 **Modern UI**: Beautiful dark theme with glass morphism effects
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Tech Stack
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Backend**: Laravel 11 (PHP)
+- **Frontend**: React 18 with TypeScript
+- **Database**: MySQL/PostgreSQL
+- **Authentication**: Laravel Sanctum
+- **Styling**: Tailwind CSS
+- **Build Tool**: Vite
 
-## Learning Laravel
+## Prerequisites
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- PHP 8.2 or higher
+- Composer
+- Node.js 18 or higher
+- MySQL/PostgreSQL database
+- Laragon (recommended for Windows) or similar local development environment
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## Installation
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 1. Clone the Repository
 
-## Laravel Sponsors
+```bash
+git clone <repository-url>
+cd TaskTrack-main
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 2. Install PHP Dependencies
 
-### Premium Partners
+```bash
+composer install
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### 3. Install Node.js Dependencies
+
+```bash
+npm install
+```
+
+### 4. Environment Setup
+
+Copy the environment file and configure your database:
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` file with your database credentials:
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=tasktrack
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
+```
+
+### 5. Generate Application Key
+
+```bash
+php artisan key:generate
+```
+
+### 6. Run Database Migrations
+
+```bash
+php artisan migrate
+```
+
+### 7. Build Frontend Assets
+
+```bash
+npm run build
+```
+
+### 8. Start the Development Server
+
+```bash
+php artisan serve
+```
+
+The application will be available at `http://localhost:8000`
+
+## Usage
+
+### First Time Setup
+
+1. Visit `http://localhost:8000`
+2. Click "Create one" to register a new account
+3. Enter your name, email, and password
+4. You'll be automatically logged in and redirected to the dashboard
+
+### Using the Application
+
+- **Dashboard**: View all your tasks with search and filter options
+- **All Tasks**: Dedicated page for comprehensive task management
+- **Calendar**: Visual calendar showing tasks by date
+- **Add Task**: Click the "Add Task" button to create new tasks
+- **Edit Task**: Click the edit icon on any task card
+- **Delete Task**: Click the delete icon and confirm
+- **Toggle Status**: Click the status badge to change task status
+
+## Troubleshooting
+
+### Common Issues
+
+#### 1. Database Connection Error
+
+```bash
+# Test database connection
+php test_auth.php
+```
+
+Make sure your database credentials are correct in `.env`
+
+#### 2. Authentication Issues
+
+- Clear browser cookies and cache
+- Check that CSRF tokens are being sent correctly
+- Verify Sanctum configuration in `config/sanctum.php`
+
+#### 3. Frontend Build Issues
+
+```bash
+# Clear npm cache
+npm cache clean --force
+
+# Reinstall dependencies
+rm -rf node_modules package-lock.json
+npm install
+```
+
+#### 4. API Endpoints Not Working
+
+Check that your routes are properly configured:
+
+```bash
+# List all routes
+php artisan route:list
+```
+
+### Development Commands
+
+```bash
+# Start development server
+php artisan serve
+
+# Watch for frontend changes
+npm run dev
+
+# Build for production
+npm run build
+
+# Run tests
+php artisan test
+
+# Clear all caches
+php artisan optimize:clear
+```
+
+## File Structure
+
+```
+TaskTrack-main/
+├── app/
+│   ├── Http/Controllers/
+│   │   ├── Api/TaskController.php
+│   │   └── Auth/
+│   ├── Models/
+│   └── Providers/
+├── resources/
+│   ├── js/
+│   │   ├── components/
+│   │   ├── hooks/
+│   │   ├── AuthContext.tsx
+│   │   ├── app.tsx
+│   │   ├── types.ts
+│   │   └── utils.ts
+│   └── views/
+├── routes/
+│   ├── api.php
+│   └── auth.php
+└── database/
+    └── migrations/
+```
+
+## API Endpoints
+
+### Authentication
+- `POST /api/register` - User registration
+- `POST /api/login` - User login
+- `POST /api/logout` - User logout
+- `GET /api/user` - Get current user
+
+### Tasks
+- `GET /api/tasks` - Get all tasks for authenticated user
+- `POST /api/tasks` - Create new task
+- `PUT /api/tasks/{id}` - Update task
+- `DELETE /api/tasks/{id}` - Delete task
 
 ## Contributing
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is open-sourced software licensed under the [MIT license](LICENSE).
+
+## Support
+
+If you encounter any issues or have questions, please:
+
+1. Check the troubleshooting section above
+2. Search existing issues
+3. Create a new issue with detailed information about your problem
+
+## Changelog
+
+### Version 1.0.0
+- Initial release
+- User authentication system
+- Task management functionality
+- Calendar view
+- Responsive design
+- Search and filter capabilities

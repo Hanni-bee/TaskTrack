@@ -1,69 +1,96 @@
-import { useState, useMemo } from 'react';
-import { Task } from '../types';
+import { useState, useEffect, useCallback } from 'react';
+import { Task, TaskFilter, TaskSortBy, SortOrder } from '../types';
+import { getLocalStorage, setLocalStorage, sortTasks } from '../utils';
 
 export function useTaskFilters() {
   const [query, setQuery] = useState('');
-  const [filter, setFilter] = useState<'all' | Task['status']>('all');
-  const [sortBy, setSortBy] = useState<'created_at' | 'due_at' | 'title'>('created_at');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [filter, setFilter] = useState<TaskFilter>('all');
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [priorityFilter, setPriorityFilter] = useState<string>('all');
+  const [sortBy, setSortBy] = useState<TaskSortBy>('created_at');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
 
-  const filterTasks = (tasks: Task[]) => {
-    return useMemo(() => {
-      let filtered = tasks;
+  // Load filters from localStorage
+  useEffect(() => {
+    const savedFilter = getLocalStorage<TaskFilter>('taskFilter', 'all');
+    const savedCategoryFilter = getLocalStorage<string>('taskCategoryFilter', 'all');
+    const savedPriorityFilter = getLocalStorage<string>('taskPriorityFilter', 'all');
+    const savedSortBy = getLocalStorage<TaskSortBy>('taskSortBy', 'created_at');
+    const savedSortOrder = getLocalStorage<SortOrder>('taskSortOrder', 'desc');
+    
+    setFilter(savedFilter);
+    setCategoryFilter(savedCategoryFilter);
+    setPriorityFilter(savedPriorityFilter);
+    setSortBy(savedSortBy);
+    setSortOrder(savedSortOrder);
+  }, []);
 
-      // Apply search query filter
-      if (query) {
-        filtered = filtered.filter(task => 
-          task.title.toLowerCase().includes(query.toLowerCase()) ||
-          (task.description && task.description.toLowerCase().includes(query.toLowerCase()))
-        );
-      }
+  // Save filters to localStorage
+  useEffect(() => {
+    setLocalStorage('taskFilter', filter);
+  }, [filter]);
 
-      // Apply status filter
-      if (filter !== 'all') {
-        filtered = filtered.filter(task => task.status === filter);
-      }
+  useEffect(() => {
+    setLocalStorage('taskCategoryFilter', categoryFilter);
+  }, [categoryFilter]);
 
-      // Apply sorting
-      filtered = [...filtered].sort((a, b) => {
-        let aValue: string | Date | undefined;
-        let bValue: string | Date | undefined;
+  useEffect(() => {
+    setLocalStorage('taskPriorityFilter', priorityFilter);
+  }, [priorityFilter]);
 
-        if (sortBy === 'title') {
-          aValue = a.title.toLowerCase();
-          bValue = b.title.toLowerCase();
-        } else if (sortBy === 'due_at') {
-          aValue = a.due_at;
-          bValue = b.due_at;
-        } else {
-          aValue = a.created_at;
-          bValue = b.created_at;
-        }
+  useEffect(() => {
+    setLocalStorage('taskSortBy', sortBy);
+  }, [sortBy]);
 
-        // Handle undefined values
-        if (aValue === undefined && bValue === undefined) return 0;
-        if (aValue === undefined) return 1;
-        if (bValue === undefined) return -1;
+  useEffect(() => {
+    setLocalStorage('taskSortOrder', sortOrder);
+  }, [sortOrder]);
 
-        // Compare values
-        if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
-        if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
-        return 0;
-      });
+  const filterTasks = useCallback((tasks: Task[]) => {
+    let filtered = tasks.filter(task => {
+      // Text search
+      const matchesQuery = task.title.toLowerCase().includes(query.toLowerCase()) ||
+                          (task.description && task.description.toLowerCase().includes(query.toLowerCase())) ||
+                          (task.tags && task.tags.some(tag => tag.toLowerCase().includes(query.toLowerCase())));
 
-      return filtered;
-    }, [tasks, query, filter, sortBy, sortOrder]);
-  };
+      // Status filter
+      const matchesStatus = filter === 'all' || task.status === filter;
+
+      // Category filter
+      const matchesCategory = categoryFilter === 'all' || task.category === categoryFilter;
+
+      // Priority filter
+      const matchesPriority = priorityFilter === 'all' || task.priority === priorityFilter;
+
+      return matchesQuery && matchesStatus && matchesCategory && matchesPriority;
+    });
+
+    return sortTasks(filtered, sortBy, sortOrder);
+  }, [query, filter, categoryFilter, priorityFilter, sortBy, sortOrder]);
+
+  const clearFilters = useCallback(() => {
+    setQuery('');
+    setFilter('all');
+    setCategoryFilter('all');
+    setPriorityFilter('all');
+    setSortBy('created_at');
+    setSortOrder('desc');
+  }, []);
 
   return {
-    filterTasks,
     query,
     setQuery,
     filter,
     setFilter,
+    categoryFilter,
+    setCategoryFilter,
+    priorityFilter,
+    setPriorityFilter,
     sortBy,
     setSortBy,
     sortOrder,
-    setSortOrder
+    setSortOrder,
+    filterTasks,
+    clearFilters,
   };
 }

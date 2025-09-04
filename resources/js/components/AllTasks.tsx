@@ -1,13 +1,17 @@
 import React from 'react';
 import { TaskCard } from './TaskCard';
-import { useTasks, useToasts, useTaskFilters } from '../hooks';
-import { Task } from '../types';
+import { TaskForm } from './TaskForm';
+import { useTasks, useToasts, useTaskFilters, useModal } from '../hooks';
+import { Task, TaskForm as TaskFormType } from '../types';
 
 export function AllTasks() {
-  const { tasks, loading, toggleTaskStatus, deleteTask } = useTasks();
+  const { tasks, loading, toggleTaskStatus, deleteTask, updateTask, addTask } = useTasks();
   const { toasts, addToast, removeToast } = useToasts();
   const { filterTasks, query, setQuery, filter, setFilter, sortBy, setSortBy, sortOrder, setSortOrder } = useTaskFilters();
   
+  // Modal states
+  const addModal = useModal();
+  const editModal = useModal();
   const [editingTask, setEditingTask] = React.useState<Task | null>(null);
   const [formLoading, setFormLoading] = React.useState(false);
 
@@ -24,16 +28,132 @@ export function AllTasks() {
 
   const handleEditTask = (task: Task) => {
     setEditingTask(task);
+    editModal.open();
+  };
+
+  const handleAddTask = async (taskData: TaskFormType) => {
+    setFormLoading(true);
+    try {
+      await addTask(taskData);
+      addToast({ message: 'Task added successfully!', type: 'success' });
+      addModal.close();
+    } catch (error) {
+      addToast({ message: error instanceof Error ? error.message : 'Failed to add task', type: 'error' });
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
+  const handleUpdateTask = async (taskData: TaskFormType) => {
+    if (!editingTask) return;
+    
+    setFormLoading(true);
+    try {
+      await updateTask(editingTask.id, taskData);
+      addToast({ message: 'Task updated successfully!', type: 'success' });
+      editModal.close();
+      setEditingTask(null);
+    } catch (error) {
+      addToast({ message: error instanceof Error ? error.message : 'Failed to update task', type: 'error' });
+    } finally {
+      setFormLoading(false);
+    }
   };
 
   const filteredTasks = filterTasks(tasks);
 
   return (
     <div className="space-y-4">
+      {/* Toast Notifications */}
+      {toasts.map(toast => (
+        <div key={toast.id} className="toast animate-fade-in">
+          <div className={`glass p-4 rounded-xl border ${
+            toast.type === 'success' ? 'bg-green-500/10 border-green-500/30' : 
+            toast.type === 'error' ? 'bg-red-500/10 border-red-500/30' : 
+            'bg-blue-500/10 border-blue-500/30'
+          }`}>
+            <p className={`font-medium ${
+              toast.type === 'success' ? 'text-green-400' : 
+              toast.type === 'error' ? 'text-red-400' : 
+              'text-blue-400'
+            }`}>{toast.message}</p>
+          </div>
+        </div>
+      ))}
+
+      {/* Add Task Modal */}
+      {addModal.isOpen && (
+        <div className="modal-overlay" onClick={addModal.close}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-slate-100">Add New Task</h2>
+                <button 
+                  onClick={addModal.close}
+                  className="text-slate-400 hover:text-slate-200 transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <TaskForm 
+                onSubmit={handleAddTask}
+                onCancel={addModal.close}
+                loading={formLoading}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Task Modal */}
+      {editModal.isOpen && editingTask && (
+        <div className="modal-overlay" onClick={editModal.close}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-slate-100">Edit Task</h2>
+                <button 
+                  onClick={editModal.close}
+                  className="text-slate-400 hover:text-slate-200 transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <TaskForm 
+                task={editingTask}
+                onSubmit={handleUpdateTask}
+                onCancel={editModal.close}
+                loading={formLoading}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Header */}
+      <div className="mb-8 animate-fade-in">
+        <h1 className="text-4xl font-bold text-slate-100 mb-2">All Tasks</h1>
+        <p className="text-lg text-slate-400">Manage and organize all your tasks</p>
+      </div>
+
       {/* Controls */}
       <div className="glass p-6 mb-6 animate-fade-in">
         <div className="flex flex-wrap gap-4 items-center justify-between">
           <div className="flex gap-4 items-center">
+            <button 
+              onClick={addModal.open}
+              className="btn-primary"
+            >
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Add Task
+            </button>
+            
             <input
               type="text"
               placeholder="Search tasks..."
@@ -92,9 +212,14 @@ export function AllTasks() {
               </svg>
             </div>
             <h3 className="text-xl font-medium text-slate-200 mb-2">No tasks found</h3>
-            <p className="text-slate-400">
-              {query ? 'Try adjusting your search or filters.' : 'You have no tasks yet.'}
+            <p className="text-slate-400 mb-4">
+              {query ? 'Try adjusting your search or filters.' : 'Get started by adding your first task!'}
             </p>
+            {!query && (
+              <button onClick={addModal.open} className="btn-primary">
+                Add Your First Task
+              </button>
+            )}
           </div>
         )}
 

@@ -1,41 +1,35 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
-interface KeyboardShortcuts {
-  [key: string]: () => void;
-}
-
-export function useKeyboardShortcuts(shortcuts: KeyboardShortcuts) {
-  const [showHelp, setShowHelp] = useState(false);
-
+export function useKeyboardShortcuts(shortcuts: Record<string, () => void>) {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      const key = event.key.toLowerCase();
-      const ctrl = event.ctrlKey || event.metaKey;
-      const shift = event.shiftKey;
-      const alt = event.altKey;
-
-      let shortcutKey = '';
-      if (ctrl) shortcutKey += 'ctrl+';
-      if (shift) shortcutKey += 'shift+';
-      if (alt) shortcutKey += 'alt+';
-      shortcutKey += key;
-
-      // Show help overlay
-      if (shortcutKey === 'ctrl+shift+?') {
+      // Create a normalized key combination string
+      const keys = [];
+      if (event.ctrlKey) keys.push('ctrl');
+      if (event.shiftKey) keys.push('shift');
+      if (event.altKey) keys.push('alt');
+      if (event.metaKey) keys.push('meta');
+      
+      // Add the main key (convert to lowercase for consistency)
+      const mainKey = event.key.toLowerCase();
+      keys.push(mainKey);
+      
+      // Create the combination string
+      const combination = keys.join('+');
+      
+      // Check if this combination matches any of our shortcuts
+      if (shortcuts[combination]) {
         event.preventDefault();
-        setShowHelp(!showHelp);
-        return;
-      }
-
-      if (shortcuts[shortcutKey]) {
-        event.preventDefault();
-        shortcuts[shortcutKey]();
+        shortcuts[combination]();
       }
     };
 
+    // Add event listener
     document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [shortcuts, showHelp]);
 
-  return { showHelp, setShowHelp };
+    // Cleanup function to remove event listener
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [shortcuts]);
 }

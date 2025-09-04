@@ -9,7 +9,7 @@
                 {{ $errors->first() }}
             </div>
         @endif
-        <form method="POST" action="{{ route('login') }}">
+        <form method="POST" action="{{ route('api.login') }}">
             @csrf
             <div class="space-y-4">
                 <div>

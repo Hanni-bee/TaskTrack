@@ -5,18 +5,14 @@ import '../css/app.css';
 
 // Import our new components and utilities
 import { Task, TaskForm as TaskFormType } from './types';
-import type { Toast as ToastType } from './types';
-import { csrf, getCsrfToken, apiRequest, formatDate, isOverdue, getDaysUntilDue } from './utils';
+import { formatDate } from './utils';
 import { useTasks, useToasts, useTaskFilters, useModal, useFormValidation, useKeyboardShortcuts } from './hooks';
 import { TaskCard } from './components/TaskCard';
-import { StatusBadge } from './components/StatusBadge';
 import { TaskForm } from './components/TaskForm';
 import { AllTasks } from './components/AllTasks';
 import { Calendar } from './components/Calendar';
-import { SubscriptionCard } from './components/SubscriptionCard';
-import { SubscriptionPage } from './components/SubscriptionPage';
-import { AdvancedAnalyticsDashboard } from './components/AdvancedAnalyticsDashboard';
-import { PremiumAnalyticsGate } from './components/PremiumAnalyticsGate';
+import { SubscriptionStatus } from './components/SubscriptionStatus';
+import { AnalyticsPage } from './components/AnalyticsPage';
 import { AuthProvider, useAuthContext } from './AuthContext';
 
 // --- AUTH COMPONENTS ---
@@ -100,11 +96,14 @@ function Sidebar() {
   const { logout } = useAuthContext();
   const location = useLocation();
 
+  const { user } = useAuthContext();
+  const isPremium = user?.subscription_type === 'premium';
+
   const navItems = [
     { name: 'My Day', path: '/', icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' },
     { name: 'All Tasks', path: '/tasks', icon: 'M3 4h18M3 12h18M3 20h18' },
     { name: 'Calendar', path: '/calendar', icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z' },
-    { name: 'Analytics', path: '/analytics', icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' },
+    ...(isPremium ? [{ name: 'Analytics', path: '/analytics', icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' }] : []),
   ];
 
   return (
@@ -198,15 +197,15 @@ function Login() {
     validate
   } = useFormValidation(initialValues, validationSchema);
 
-  async function onSubmit(e: React.FormEvent) {
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!validate()) return;
-    
+
     try {
       await login(values);
       addToast({ message: 'Welcome back!', type: 'success' });
-    } catch (error) {
-      addToast({ message: error instanceof Error ? error.message : 'Login failed', type: 'error' });
+    } catch (error: any) {
+      addToast({ message: error.message || 'Login failed', type: 'error' });
     }
   }
 
@@ -296,15 +295,15 @@ function Register() {
     validate
   } = useFormValidation(initialValues, validationSchema);
 
-  async function onSubmit(e: React.FormEvent) {
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!validate()) return;
-    
+
     try {
       await register(values);
       addToast({ message: 'Account created successfully!', type: 'success' });
-    } catch (error) {
-      addToast({ message: error instanceof Error ? error.message : 'Registration failed', type: 'error' });
+    } catch (error: any) {
+      addToast({ message: error.message || 'Registration failed', type: 'error' });
     }
   }
 
@@ -409,7 +408,6 @@ function Dashboard() {
   const addModal = useModal();
   const editModal = useModal();
   const [editingTask, setEditingTask] = React.useState<Task | null>(null);
-  const [currentView, setCurrentView] = useState<'dashboard' | 'all-tasks' | 'calendar' | 'subscription'>('dashboard');
   const [formLoading, setFormLoading] = React.useState(false);
 
   // Keyboard shortcuts
@@ -512,6 +510,9 @@ function Dashboard() {
         <h1 className="text-4xl font-bold text-slate-100">{greeting}, {user?.name || 'User'}.</h1>
         <p className="text-lg mt-2 text-slate-400">Run your day or your day will run you.</p>
       </div>
+
+      {/* Subscription Status */}
+      <SubscriptionStatus />
 
       {/* Controls */}
       <div className="glass p-6 mb-6 animate-fade-in">
@@ -622,8 +623,7 @@ function App() {
           <Route path="/" element={<RequireAuth><Dashboard /></RequireAuth>} />
           <Route path="/tasks" element={<RequireAuth><AllTasks /></RequireAuth>} />
           <Route path="/calendar" element={<RequireAuth><Calendar /></RequireAuth>} />
-          <Route path="/analytics" element={<RequireAuth><PremiumAnalyticsGate><AdvancedAnalyticsDashboard tasks={[]} /></PremiumAnalyticsGate></RequireAuth>} />
-          <Route path="/subscription" element={<RequireAuth><SubscriptionPage /></RequireAuth>} />
+          <Route path="/analytics" element={<RequireAuth><AnalyticsPage /></RequireAuth>} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
@@ -631,4 +631,4 @@ function App() {
 }
 
 const el = document.getElementById('root');
-if (el) createRoot(el).render(<React.StrictMode><App /></React.StrictMode>);
+if (el) createRoot(el).render(<><App /></>);

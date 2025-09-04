@@ -28,24 +28,17 @@ return [
         'sanctum/csrf-cookie',
     ],
 
-    'allowed_methods' => ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    'allowed_methods' => ['*'],
 
     'allowed_origins' => [],
 
     // Use a pattern to match localhost with any port for frontend development
     'allowed_origins_patterns' => [
         '/^http:\/\/localhost(:\d+)?$/',
-        '/^http:\/\/127\.0\.0\.1(:\d+)?$/',
-        '/^http:\/\/192\.168\.\d+\.\d+(:\d+)?$/'
+        '/^http:\/\/127\.0\.0\.1(:\d+)?$/'
     ],
 
-    'allowed_headers' => [
-        'Accept',
-        'Authorization',
-        'Content-Type',
-        'X-Requested-With',
-        'X-CSRF-TOKEN'
-    ],
+    'allowed_headers' => ['*'],
 
     'exposed_headers' => [],
 

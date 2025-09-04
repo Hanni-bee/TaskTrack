@@ -18,13 +18,14 @@ class Task extends Model
     protected $fillable = [
         'title',
         'description',
-        'status',
-        'due_at',
-        'user_id',
         'category',
         'priority',
+        'tags',
+        'status',
+        'due_at',
         'reminder_at',
         'notes',
+        'user_id',
     ];
 
     /**
@@ -35,6 +36,7 @@ class Task extends Model
     protected $casts = [
         'due_at' => 'datetime',
         'reminder_at' => 'datetime',
+        'tags' => 'array',
     ];
 
     /**
@@ -43,5 +45,51 @@ class Task extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the category color.
+     */
+    public function getCategoryColor(): string
+    {
+        return match($this->category) {
+            'work' => 'blue',
+            'personal' => 'green',
+            'health' => 'red',
+            'finance' => 'yellow',
+            'education' => 'purple',
+            'shopping' => 'pink',
+            'travel' => 'indigo',
+            default => 'gray'
+        };
+    }
+
+    /**
+     * Get the priority color.
+     */
+    public function getPriorityColor(): string
+    {
+        return match($this->priority) {
+            'high' => 'red',
+            'medium' => 'yellow',
+            'low' => 'green',
+            default => 'gray'
+        };
+    }
+
+    /**
+     * Get the priority label.
+     */
+    public function getPriorityLabel(): string
+    {
+        return ucfirst($this->priority);
+    }
+
+    /**
+     * Get the category label.
+     */
+    public function getCategoryLabel(): string
+    {
+        return ucfirst($this->category);
     }
 }

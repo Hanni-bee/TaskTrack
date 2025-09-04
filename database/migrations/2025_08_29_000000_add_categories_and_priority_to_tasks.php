@@ -13,16 +13,13 @@ return new class extends Migration
     {
         Schema::table('tasks', function (Blueprint $table) {
             if (!Schema::hasColumn('tasks', 'category')) {
-                $table->string('category')->nullable()->after('status');
+                $table->string('category')->default('general')->after('description');
             }
             if (!Schema::hasColumn('tasks', 'priority')) {
                 $table->enum('priority', ['low', 'medium', 'high'])->default('medium')->after('category');
             }
-            if (!Schema::hasColumn('tasks', 'reminder_at')) {
-                $table->timestamp('reminder_at')->nullable()->after('due_at');
-            }
-            if (!Schema::hasColumn('tasks', 'notes')) {
-                $table->text('notes')->nullable()->after('description');
+            if (!Schema::hasColumn('tasks', 'tags')) {
+                $table->json('tags')->nullable()->after('priority');
             }
         });
     }
@@ -33,7 +30,19 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('tasks', function (Blueprint $table) {
-            $table->dropColumn(['category', 'priority', 'reminder_at', 'notes']);
+            $columns = [];
+            if (Schema::hasColumn('tasks', 'category')) {
+                $columns[] = 'category';
+            }
+            if (Schema::hasColumn('tasks', 'priority')) {
+                $columns[] = 'priority';
+            }
+            if (Schema::hasColumn('tasks', 'tags')) {
+                $columns[] = 'tags';
+            }
+            if (!empty($columns)) {
+                $table->dropColumn($columns);
+            }
         });
     }
 };

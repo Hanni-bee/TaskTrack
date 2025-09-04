@@ -1,20 +1,18 @@
 // Task Management Types
 export interface Task {
-  id: string;
+  id: number;
   title: string;
   description?: string;
+  category: 'work' | 'personal' | 'health' | 'finance' | 'education' | 'shopping' | 'travel' | 'general';
+  priority: 'low' | 'medium' | 'high';
+  tags?: string[];
   status: 'pending' | 'in_progress' | 'done';
   due_at?: string;
-  created_at: string;
-  updated_at: string;
-  user_id: string;
-  category?: string;
-  priority?: 'low' | 'medium' | 'high';
   reminder_at?: string;
   notes?: string;
-  notified_overdue?: boolean;
-  notified_reminder?: boolean;
-  total_time?: number;
+  created_at: string;
+  updated_at: string;
+  user_id: number;
 }
 
 export interface User {
@@ -30,18 +28,6 @@ export interface User {
   can_set_reminders: boolean;
   can_use_categories: boolean;
   can_export_data: boolean;
-}
-
-export interface Subscription {
-  subscription_type: 'basic' | 'premium';
-  subscription_expires_at?: string;
-  task_limit: number;
-  current_tasks: number;
-  remaining_tasks: number;
-  can_set_reminders: boolean;
-  can_use_categories: boolean;
-  can_export_data: boolean;
-  is_premium: boolean;
 }
 
 // Form Types
@@ -60,12 +46,13 @@ export interface RegisterForm {
 export interface TaskForm {
   title: string;
   description?: string;
-  due_at?: string;
-  status: 'pending' | 'in_progress' | 'done';
-  category?: string;
+  category: 'work' | 'personal' | 'health' | 'finance' | 'education' | 'shopping' | 'travel' | 'general';
   priority: 'low' | 'medium' | 'high';
+  tags?: string[];
+  due_at?: string;
   reminder_at?: string;
   notes?: string;
+  status: 'pending' | 'in_progress' | 'done';
 }
 
 // UI Types
@@ -77,25 +64,48 @@ export interface Toast {
   type: ToastType;
 }
 
+// Subscription Types
+export interface Subscription {
+  id: number;
+  user_id: number;
+  type: 'basic' | 'premium';
+  status: 'active' | 'inactive' | 'cancelled';
+  expires_at?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+// Drag and Drop Types
+export interface DragItem {
+  id: number;
+  type: 'task';
+  task: Task;
+}
+
 export type TaskFilter = 'all' | 'pending' | 'in_progress' | 'done';
-export type TaskSortBy = 'created_at' | 'due_at' | 'title';
+export type TaskSortBy = 'created_at' | 'due_at' | 'title' | 'priority' | 'category';
 export type SortOrder = 'asc' | 'desc';
 
+// Category and Priority Types
+export interface CategoryOption {
+  value: string;
+  label: string;
+  color: string;
+  icon: string;
+}
+
+export interface PriorityOption {
+  value: string;
+  label: string;
+  color: string;
+  icon: string;
+}
+
 // API Response Types
-export interface ValidationErrors {
-  [key: string]: string[];
-}
-
-export interface FormState<T> {
-  data: T;
-  errors: ValidationErrors;
-  processing: boolean;
-}
-
 export interface ApiResponse<T = any> {
-  data: T;
+  data?: T;
   message?: string;
-  errors?: ValidationErrors;
+  errors?: Record<string, string[]>;
 }
 
 export interface PaginatedResponse<T> {
@@ -106,51 +116,12 @@ export interface PaginatedResponse<T> {
   total: number;
 }
 
-// React types for Laravel environment
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      [elemName: string]: any;
-    }
-  }
-}
-
-// Enhanced feature types
-export interface TimeEntry {
-  id: string;
-  taskId: string;
-  startTime: Date;
-  endTime?: Date;
-  duration: number;
-  description?: string;
-}
-
-export interface TaskTemplate {
-  id: string;
-  name: string;
-  description: string;
-  category: string;
-  priority: 'low' | 'medium' | 'high';
-  estimatedDuration?: number;
-  tags: string[];
-  icon: string;
-}
-
-export interface DragItem {
-  id: string;
-  index: number;
-  type: 'task';
-}
-
-export type Theme = 'light' | 'dark' | 'system';
-export type ResolvedTheme = 'light' | 'dark';
-
 // Component Props Types
 export interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
-  title?: string;
-  children: any;
+  title: string;
+  children: React.ReactNode;
 }
 
 export interface ToastProps {
